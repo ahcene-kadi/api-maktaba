@@ -3,10 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\BookRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\Entity(repositoryClass=BookRepository::class)
+ * @ApiResource
  */
 class Book
 {
@@ -59,6 +63,16 @@ class Book
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $language;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Loan::class, mappedBy="book")
+     */
+    private $loans;
+
+    public function __construct()
+    {
+        $this->loans = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -157,6 +171,36 @@ class Book
     public function setLanguage(?string $language): self
     {
         $this->language = $language;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Loan[]
+     */
+    public function getLoans(): Collection
+    {
+        return $this->loans;
+    }
+
+    public function addLoan(Loan $loan): self
+    {
+        if (!$this->loans->contains($loan)) {
+            $this->loans[] = $loan;
+            $loan->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLoan(Loan $loan): self
+    {
+        if ($this->loans->removeElement($loan)) {
+            // set the owning side to null (unless already changed)
+            if ($loan->getBook() === $this) {
+                $loan->setBook(null);
+            }
+        }
 
         return $this;
     }

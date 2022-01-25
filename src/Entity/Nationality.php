@@ -10,7 +10,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\Entity(repositoryClass=NationalityRepository::class)
- * @ApiResource
+ * @ApiResource()
  */
 class Nationality
 {
